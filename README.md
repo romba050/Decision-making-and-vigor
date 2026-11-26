@@ -1,9 +1,11 @@
 # Decision making and vigor
-Public repository containing full code to run the tasks and questionnaires. It also contains anonymized data and scripts in R to analyse them to reproduce results in our manuscript. 
+
+Public repository containing full code to run the tasks and questionnaires. It also contains anonymized data and scripts in R to analyse them to reproduce results in our manuscript.
 
 ## Task
 
 We have adapted three existing task to our needs (detailed description of the modifications can be found in the Supplementary Materials) and developed the Effort Task de novo. Our battery thus consists of four gamified tasks tapping into mechanisms of RL and vigor, namely:
+
 - Reinforcement Learning / Working Memory Task (Collins & Frank, 2012)
 - Go/No-Go Task (Zorowitz et al., 2025)
 - Foraging Task (Harhen & Bornstein, 2023)
@@ -12,62 +14,77 @@ We have adapted three existing task to our needs (detailed description of the mo
 ## Structure
 
 - /tasks: Contains code for the tasks and questionnaires in JavaScript
-- /styles: Containes stylesheet files necessary to display tasks correctly 
+- /styles: Containes stylesheet files necessary to display tasks correctly
 - /data: Empty folder. Follow the instructions in README.md inside the folder to download the data.
 - /computational modelling: Includes all scripts related to computational modelling, parameter recovery and model comparisons:
-    - Input files to these analyses are located in *data/sessionX/comp_modelling/task*
-    - Output files are *data/comp_modelling/*
-- /analysis: Contains analysis scripts for each task
-    *main_analysis.Rmd* is the main analysis file that generatestables, figures and analyses used in the manuscript (but also
-    other analyses that we made).
 
-    To obtain behavioral results from each task (such as performance metrics) one has to run a script for the specific task. At the top of the script a session (0, 1 or 2) is given by variable *day* (e.g., *day <- 1*)
+  - Input files to these analyses are located in *data/sessionX/comp_modelling/task*
+  - Output files are *data/comp_modelling/*
+- /analysis: Contains analysis scripts for each task
+  *main_analysis.Rmd* is the main analysis file that generatestables, figures and analyses used in the manuscript (but also
+  other analyses that we made).
+
+  To obtain behavioral results from each task (such as performance metrics) one has to run a script for the specific task. At the top of the script a session (0, 1 or 2) is given by variable *day* (e.g., *day <- 1*)
 - /output: Contains figures and other generated outputs by scripts in /analysis for each respective session
 
 ## Running the battery
 
 The battery was designed to be tested online on desktops with keyboards. We used JavaScript and jsPsych (de Leeuw et al., 2023), a framework for creating behavioral experiments.  The only pre-requisite to run the tasks is having an internet browser and enabled JavaScript. The battery can be launched by opening *index.html* in the browser and then specifying which session or specific task one desires to run. Parameters are added at the end of the URL (the battery will not run if no parameter is provided):
 
-Session: ?day (0,1,2) e.g., 
+Session: ?day (0,1,2) e.g.,
 
-```...index.html?day=1```
+``...index.html?day=1``
 
-Task: ?task (rlwm, gng, effort, foraging), e.g., 
+Task: ?task (rlwm, gonogo, effort, foraging), e.g.,
 
-```...index.html?task=effort```
+``...index.html?task=effort``
+
+Only one parameter is used: if both are given, *task* takes precedence and *day* is ignored. Single tasks always run in their session 1 version.
+
+### Running locally
+
+Rather than opening *index.html* directly as a file, serve it through a local web server so it behaves as it does when hosted online. With Python 3 installed, run from the repository root:
+
+```bash
+./serve.sh day=1
+./serve.sh task=effort
+```
+
+This starts a server reachable only from your machine and opens the battery in your browser with the given parameter. Press Ctrl+C to stop it. 
 
 ## Saving data
 
-The battery was hosted on Pavlovia.org (Pavlovia; Open Science Tools, Nottingham, UK) where all generated data was saved after running by each participant. However,thanks to the flexibility of the jsPsych library, it is entirely up to a researcher which platform they use or whether they host the experiment themselves (refer to https://www.jspsych.org/latest/overview/running-experiments/). If you intend to test it or run locally, you can obtain generated data at any time by typing 
+The battery was hosted on Pavlovia.org (Pavlovia; Open Science Tools, Nottingham, UK) where all generated data was saved after running by each participant. However,thanks to the flexibility of the jsPsych library, it is entirely up to a researcher which platform they use or whether they host the experiment themselves (refer to https://www.jspsych.org/latest/overview/running-experiments/). If you intend to test it or run locally, you can obtain generated data at any time by typing
 
-```jsPsych.data.get()```
+``jsPsych.data.get()``
 
 in the browser console (see https://www.jspsych.org/latest/reference/jspsych-data/)
-
 
 ## Reproducing/analysing data
 
 #### Pre-requisities
+
 - R (and ideally RStudio)
 - MATLAB (with parallel processing)
 - Access to a server which supports SLURM. Parameter estimation of the WMH model is computationally very heavy and is not feasible
-to run it interactively. 
+  to run it interactively.
 
 #### Step-by-step
+
 To reproduce our analyses or to analyse your own data generated by our tasks, follow the pipeline below:
 
+1. a. If you want to re-analyse our data, head to the */data* folder, follow the instructions in the README.md and then skip to _step 3_.
 
-1. 
-    a. If you want to re-analyse our data, head to the */data* folder, follow the instructions in the README.md and then skip to _step 3_. 
-
-    b. If you collected your own data, move all .csv files to */data/sessionX* (session0, session1 or session2) folder.
+   b. If you collected your own data, move all .csv files to */data/sessionX* (session0, session1 or session2) folder.
 2. Run the script *load_data.R* in the */analysis* folder to parse the raw data files into respective task folders.
 3. In the */analysis* folder run single-task analysis scripts for all the tasks that you want to analyse (for instance effort_load_data.R). To analyse data from all four tasks, run every script (*_load_data.R) one by one.
 4. Running each single-task script results in saving output figures and .csv files to folder */output*. Moreover, it generates .csv matrix for further computational modelling analyses stored in */data/session*/comp_modelling/*
 5. When the input for the computational modelling analyses is generated, refer to folder */computational_modelling*. There you can first estimate the parameters in the folder */comp_modelling_sessionX*, carry out parameter recovery and then carry out the model comparison for RLWM and Effort task. For exact step-by-step guide refer to a respective README.md in each of the folders.
-- Start with estimating the parameters for one/both sessions using the instructions in the */comp_modelling_sessionX*. 
+
+- Start with estimating the parameters for one/both sessions using the instructions in the */comp_modelling_sessionX*.
 - After estimating the parameters, to run the parameter recovery, go to the folder */parameter recovery* and follow the instructions for each of the task
 - Running model comparison and obtaining confusion matrix is done using the scripts in the folder */model validation*. Open the folder and follow the instructions.
+
 6. To get a .csv output of the estimated parameters and continue with the analysis, run *convert_data.m* in */computational modelling* folder.
 7. Run *main_analysis.Rmd* in the */analysis* folder to reproduce tables, plots and analyses done in the manuscript (and many more).
 8. To (re-)run the LPA analysis, run the *LatentClassAnalysis.Rmd* script in the */analysis* folder.
