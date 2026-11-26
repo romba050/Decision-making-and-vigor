@@ -1,6 +1,4 @@
 *.csv
-*-html
-*.png
-*.jpg
+*.html
 *.asv
 *.Rhistory
