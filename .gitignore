@@ -1,4 +1,7 @@
 *.csv
 *.html
+*.jpg
+*.gif
+*.png
 *.asv
 *.Rhistory
